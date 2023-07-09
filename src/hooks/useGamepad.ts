@@ -1,34 +1,35 @@
-import { useState } from "react";
+import { useRef } from "react";
 import { useGamepads } from "react-ts-gamepads";
 import { getMappingForGamepad } from "../utils/mapping";
 import { GamepadRef } from "react-ts-gamepads";
-import { GamepadCallbacks, GamepadButtonStates } from "../types/gamepad";
+import {
+  GamepadCallbacks,
+  GamepadButtonStates,
+  GamepadSpamTimeouts,
+} from "../types/gamepad";
 import { getGamepadEvents, processGamepadEvents } from "../utils/events";
 
 const useGamepad = (callbacks: GamepadCallbacks) => {
-  const [buttonPressStates, setButtonPressStates] =
-    useState<GamepadButtonStates>({});
+  const buttonPressStatesRef = useRef<GamepadButtonStates>({});
+  const spamTimeouts = useRef<GamepadSpamTimeouts>({});
 
   const onUpdate = (gamepads: GamepadRef) => {
-    const gamepadKey = Object.keys(gamepads)[0];
-    const gamepad = gamepads[gamepadKey];
+    const gamepad = gamepads[0];
     if (!gamepad) {
       console.error("No gamepad detected.");
       return;
     }
     const mapping = getMappingForGamepad(gamepad);
     const currentEvents = getGamepadEvents(gamepad, mapping);
-    const newButtonPressStates = processGamepadEvents(
+    processGamepadEvents(
       currentEvents,
-      buttonPressStates,
-      callbacks
+      callbacks,
+      buttonPressStatesRef.current,
+      spamTimeouts.current
     );
-    setButtonPressStates(newButtonPressStates);
   };
 
-  useGamepads((gamepads) => onUpdate(gamepads));
-
-  return buttonPressStates;
+  useGamepads(onUpdate);
 };
 
 export default useGamepad;

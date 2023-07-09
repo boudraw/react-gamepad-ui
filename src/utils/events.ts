@@ -1,9 +1,13 @@
+import { SPAM_DELAY, SPAM_INTERVAL } from "../constants/spam";
 import {
   GamepadButtonStates,
+  GamepadCallback,
   GamepadCallbacks,
   GamepadEvent,
   GamepadMapping,
+  GamepadSpamTimeouts,
 } from "../types/gamepad";
+import _get from "lodash/get";
 
 export const getGamepadEvents = (
   gamepad: Gamepad,
@@ -22,29 +26,59 @@ export const getGamepadEvents = (
 
 export const processGamepadEvents = (
   currentEvents: GamepadEvent[],
+  callbacks: GamepadCallbacks,
   buttonPressStates: GamepadButtonStates,
-  callbacks: GamepadCallbacks
+  spamTimeouts: GamepadSpamTimeouts
 ) => {
-  const newButtonPressStates = { ...buttonPressStates };
+  // Handle button presses.
   for (const event of currentEvents) {
-    const callback = callbacks[event];
-    if (callback) {
+    const wasPressed = buttonPressStates[event];
+    const callback = callbacks[event] as GamepadCallback;
+    if (callback && !wasPressed) {
       if (typeof callback === "function") {
         callback();
       } else if (callback.onPress) {
         callback.onPress();
       }
+
+      // Clear any existing timeout.
+      if (spamTimeouts[event]) {
+        clearTimeout(spamTimeouts[event]!);
+      }
+
+      // Create a new timeout.
+      spamTimeouts[event] = setTimeout(() => {
+        // Start spamming after a delay.
+        spamTimeouts[event] = setInterval(() => {
+          if (typeof callback === "function") {
+            callback();
+          } else if (callback.onPress) {
+            callback.onPress();
+          }
+        }, SPAM_INTERVAL);
+      }, SPAM_DELAY);
     }
-    newButtonPressStates[event] = true;
+    buttonPressStates[event] = true;
   }
-  for (const event of Object.keys(buttonPressStates) as GamepadEvent[]) {
-    if (!currentEvents.includes(event) && buttonPressStates[event]) {
-      const callback = callbacks[event];
+
+  // Handle button releases.
+  for (const event of Object.keys(buttonPressStates)) {
+    if (
+      !currentEvents.includes(event as GamepadEvent) &&
+      buttonPressStates[event]
+    ) {
+      const callback = callbacks[event] as GamepadCallback;
       if (callback && "onRelease" in callback && callback.onRelease) {
         callback.onRelease();
       }
-      newButtonPressStates[event] = false;
+
+      // Clear the spam timeout.
+      if (spamTimeouts[event]) {
+        clearTimeout(spamTimeouts[event]!);
+        spamTimeouts[event] = null;
+      }
+
+      buttonPressStates[event] = false;
     }
   }
-  return newButtonPressStates;
 };

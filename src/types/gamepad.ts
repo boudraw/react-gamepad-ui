@@ -21,8 +21,10 @@ export interface GamepadMapping {
 export type GamepadButtonStates = Record<GamepadEvent, boolean>;
 
 export interface GamepadButtonCallback {
-  onPress?: () => void;
-  onRelease?: () => void;
+  onPress?: () => any;
+  onRelease?: () => any;
 }
-export type GamepadCallback = GamepadButtonCallback | (() => void);
-export type GamepadCallbacks = Record<GamepadEvent, GamepadCallback>;
+export type GamepadCallback = GamepadButtonCallback | (() => any);
+export type GamepadCallbacks = Record<Partial<GamepadEvent>, GamepadCallback>;
+
+export type GamepadSpamTimeouts = Record<GamepadEvent, NodeJS.Timeout | null>;
