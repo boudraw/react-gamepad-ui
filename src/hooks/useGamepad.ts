@@ -1,52 +1,34 @@
 import { useState } from "react";
-import { useGamepads } from "react-gamepads";
+import { useGamepads } from "react-ts-gamepads";
+import { getMappingForGamepad } from "../utils/mapping";
+import { GamepadRef } from "react-ts-gamepads";
+import { GamepadCallbacks, GamepadButtonStates } from "../types/gamepad";
+import { getGamepadEvents, processGamepadEvents } from "../utils/events";
 
-import _isEqual from "lodash/isEqual";
+const useGamepad = (callbacks: GamepadCallbacks) => {
+  const [buttonPressStates, setButtonPressStates] =
+    useState<GamepadButtonStates>({});
 
-const axesConfig = [
-  { positiveType: "Right", negativeType: "Left" },
-  { positiveType: "Down", negativeType: "Up" },
-  { positiveType: "Right", negativeType: "Left" },
-  { positiveType: "Down", negativeType: "Up" },
-];
-
-const axisPositiveThreshold = 0.5;
-const axisNegativeThreshold = -0.5;
-
-const useGamepad = () => {
-  const [activeButtons, setActiveButtons] = useState();
-  const [activeAxes, setActiveAxes] = useState();
-
-  const seekChanges = (gamepads) => {
-    const gamepadAxesState =
-      gamepads && Object.keys(gamepads).length
-        ? gamepads[Object.keys(gamepads)[0]].axes
-        : [];
-
-    const mapAxes = (axesToMap = []) => {
-      return axesToMap.map((axis, i) => ({
-        type: axesConfig[i],
-        positiveValue: axis >= axisPositiveThreshold,
-        negativeValue: axis <= axisNegativeThreshold,
-        index: i,
-      }));
-    };
-    const axes = mapAxes(gamepadAxesState);
-
-    const buttons =
-      gamepads && Object.keys(gamepads).length
-        ? gamepads[Object.keys(gamepads)[0]].buttons.map(
-            (button) => button.pressed
-          )
-        : [];
-
-    if (!_isEqual(buttons, activeButtons)) setActiveButtons(buttons);
-    if (!_isEqual(axes, activeAxes)) setActiveAxes(axes);
+  const onUpdate = (gamepads: GamepadRef) => {
+    const gamepadKey = Object.keys(gamepads)[0];
+    const gamepad = gamepads[gamepadKey];
+    if (!gamepad) {
+      console.error("No gamepad detected.");
+      return;
+    }
+    const mapping = getMappingForGamepad(gamepad);
+    const currentEvents = getGamepadEvents(gamepad, mapping);
+    const newButtonPressStates = processGamepadEvents(
+      currentEvents,
+      buttonPressStates,
+      callbacks
+    );
+    setButtonPressStates(newButtonPressStates);
   };
 
-  useGamepads((gamepads) => seekChanges(gamepads));
+  useGamepads((gamepads) => onUpdate(gamepads));
 
-  return { buttons: activeButtons, axes: activeAxes };
+  return buttonPressStates;
 };
 
 export default useGamepad;
