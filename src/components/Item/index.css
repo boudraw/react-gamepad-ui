@@ -1,9 +1,18 @@
 .item {
-  padding: 4px;
-  border-radius: 7px;
-  border: 1px solid #ccc;
+  padding: 8px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  background-color: transparent;
+  transition: background-color 0.05s ease-in-out;
 }
 
 .item.selected {
-  border: 2px solid #000;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.item.pressed {
+  background-color: rgba(0, 0, 0, 0.2);
 }

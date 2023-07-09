@@ -1,4 +1,4 @@
 export interface Item {
-  id: number;
-  render: (isSelected: boolean) => JSX.Element;
+  id: string;
+  render: () => JSX.Element;
 }

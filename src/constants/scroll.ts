@@ -1,0 +1,1 @@
+export const SMOOTH_SCROLL_DURATION = 80;

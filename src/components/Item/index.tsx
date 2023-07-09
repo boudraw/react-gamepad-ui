@@ -1,17 +1,29 @@
-import React from "react";
-import { Item } from "../../types/list";
+import React, { useMemo } from "react";
+import { Item as ItemType } from "../../types/list";
+
+import "./index.css";
 
 type Props = {
-  item: Item;
+  item: ItemType;
   isSelected: boolean;
+  isPressed?: boolean;
 };
 
-const Item = ({ item, isSelected }: Props) => {
-  return (
-    <div className={`item ${isSelected ? " selected" : ""}`}>
-      {item.render(isSelected)}
-    </div>
-  );
-};
+const Item = React.forwardRef<HTMLDivElement, Props>(
+  ({ item, isSelected, isPressed }, ref) => {
+    const renderedChild = useMemo(() => item.render(), [item]);
+
+    return (
+      <div
+        ref={ref}
+        className={`item${isSelected ? " selected" : ""}${
+          isPressed ? " pressed" : ""
+        }`}
+      >
+        {renderedChild}
+      </div>
+    );
+  }
+);
 
 export default Item;
