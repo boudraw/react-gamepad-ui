@@ -61,7 +61,7 @@ export const processGamepadEvents = (
   }
 
   // Handle button releases.
-  for (const event of Object.keys(buttonPressStates)) {
+  for (const event of Object.keys(buttonPressStates) as GamepadEvent[]) {
     if (
       !currentEvents.includes(event as GamepadEvent) &&
       buttonPressStates[event]

@@ -19,5 +19,8 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-ts-gamepads": "^1.0.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.14"
   }
 }

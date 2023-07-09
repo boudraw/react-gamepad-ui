@@ -1,0 +1,9 @@
+.item {
+  padding: 4px;
+  border-radius: 7px;
+  border: 1px solid #ccc;
+}
+
+.item.selected {
+  border: 2px solid #000;
+}
