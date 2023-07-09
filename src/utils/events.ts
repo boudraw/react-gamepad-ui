@@ -7,7 +7,6 @@ import {
   GamepadMapping,
   GamepadSpamTimeouts,
 } from "../types/gamepad";
-import _get from "lodash/get";
 
 export const getGamepadEvents = (
   gamepad: Gamepad,

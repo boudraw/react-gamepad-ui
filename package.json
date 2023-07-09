@@ -17,7 +17,6 @@
   "author": "BOUDRAW",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-ts-gamepads": "^1.0.5"
   }
