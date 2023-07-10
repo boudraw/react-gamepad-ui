@@ -6,10 +6,12 @@
   align-items: center;
   border-radius: 3px;
   background-color: transparent;
-  transition: background-color 0.05s ease-in-out;
+  transition: background-color transform 0.05s ease-in-out;
+  transform: scale(0.95);
 }
 
 .item.selected {
+  transform: scale(1);
   background-color: rgba(0, 0, 0, 0.1);
 }
 

@@ -30,3 +30,8 @@ export type GamepadCallbacks = Partial<Record<GamepadEvent, GamepadCallback>>;
 export type GamepadSpamTimeouts = Partial<
   Record<GamepadEvent, NodeJS.Timeout | null>
 >;
+
+export interface GamepadState {
+  buttonStates: GamepadButtonStates;
+  spamTimeouts: GamepadSpamTimeouts;
+}
